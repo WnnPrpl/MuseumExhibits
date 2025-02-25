@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch.Operations;
+using Microsoft.AspNetCore.JsonPatch;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Models;
+using System.Security.Principal;
 
 namespace MuseumExhibits.Application.Mapping
 {
@@ -22,6 +25,8 @@ namespace MuseumExhibits.Application.Mapping
                 .ForMember(dest => dest.Exhibits, opt => opt.Ignore());
 
 
+            CreateMap<JsonPatchDocument<ExhibitDTO>, JsonPatchDocument<Exhibit>>();
+            CreateMap<Operation<ExhibitDTO>, Operation<Exhibit>>();
         }
     }
 }

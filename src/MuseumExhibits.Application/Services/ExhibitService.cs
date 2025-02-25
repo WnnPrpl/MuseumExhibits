@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
@@ -74,6 +75,29 @@ namespace MuseumExhibits.Application.Services
             {
                 throw;
             }
+        }
+
+        public async Task PartialUpdateAsync(Guid id, JsonPatchDocument<ExhibitDTO> patchDoc)
+        {
+            try
+            {
+                var exhibit = await _exhibitRepository.GetByIdAsync(id);
+                if (exhibit == null)
+                {
+                    throw new ArgumentException("Exhibit not found.");
+                }
+                var exhibitPatch = _mapper.Map<JsonPatchDocument<Exhibit>>(patchDoc);
+
+                exhibitPatch.ApplyTo(exhibit);
+
+                await _exhibitRepository.UpdateAsync(exhibit);
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
         }
 
         public async Task Delete(Guid id)

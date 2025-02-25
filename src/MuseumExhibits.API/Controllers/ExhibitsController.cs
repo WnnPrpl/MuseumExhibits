@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
+using MuseumExhibits.Core.Models;
 
 
 namespace MuseumExhibits.API.Controllers
@@ -83,7 +85,30 @@ namespace MuseumExhibits.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        
+
+        [HttpPatch("{id:guid}")]
+        [Consumes("application/json-patch+json")]
+        public async Task<IActionResult> PatchExhibit(Guid id, [FromBody] JsonPatchDocument<ExhibitDTO> patchDoc)
+        {
+
+            if (patchDoc == null)
+                return BadRequest("Invalid patch data.");
+
+            try
+            {
+                await _exhibitService.PartialUpdateAsync(id, patchDoc);
+                return NoContent();
+            }
+
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
