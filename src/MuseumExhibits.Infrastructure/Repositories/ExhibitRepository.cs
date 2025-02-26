@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using MuseumExhibits.Core.Abstractions;
+using MuseumExhibits.Core.Filters;
 using MuseumExhibits.Core.Models;
 using MuseumExhibits.Infrastructure.Data;
 
@@ -74,21 +75,52 @@ namespace MuseumExhibits.Infrastructure.Repostories
             return await query.AsNoTracking().Where(e => e.CategoryId == categoryId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Exhibit>> GetByPageAsync(int page, int pageSize, bool isAdmin)
+        public async Task<(IEnumerable<Exhibit> Exhibits, int TotalCount)> GetExhibitsAsync(ExhibitFilter filter)
         {
-            var query = _context.Exhibit.AsQueryable();
+            IQueryable<Exhibit> query = _context.Exhibit.AsNoTracking();
 
-            if (!isAdmin)
+            // Фільтрація
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                query = query.Where(e => e.Name.Contains(filter.Name));
+
+            if (filter.CreationExactDate.HasValue)
+                query = query.Where(e => e.CreationExactDate == filter.CreationExactDate);
+
+            else if (filter.CreationYear.HasValue)
+                query = query.Where(e => e.CreationYear == filter.CreationYear);
+
+            else if (filter.CreationCentury.HasValue)
+                query = query.Where(e => e.CreationCentury == filter.CreationCentury);
+
+            if (filter.EntryDate.HasValue)
+                query = query.Where(e => e.EntryDate == filter.EntryDate);
+
+            if (filter.CategoryId.HasValue)
+                query = query.Where(e => e.CategoryId == filter.CategoryId);
+
+            // Сортування
+            switch (filter.SortBy?.ToLower())
             {
-                query = query.Where(e => e.Visible);
+                case "name":
+                    query = filter.Descending ? query.OrderByDescending(e => e.Name) : query.OrderBy(e => e.Name);
+                    break;
+                case "creationexactdate":
+                    query = filter.Descending ? query.OrderByDescending(e => e.CreationExactDate) : query.OrderBy(e => e.CreationExactDate);
+                    break;
+                case "entrydate":
+                default:
+                    query = filter.Descending ? query.OrderByDescending(e => e.EntryDate) : query.OrderBy(e => e.EntryDate);
+                    break;
             }
 
-            return await query
-                .AsNoTracking()
-                .Include(e => e.Category)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            int totalCount = await query.CountAsync();
+
+            query = query.Skip((filter.PageNumber - 1) * filter.PageSize)
+                         .Take(filter.PageSize);
+
+
+            var exhibits = await query.ToListAsync();
+            return (exhibits, totalCount);
         }
 
     }
