@@ -17,14 +17,14 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<Image> GetByIdAsync(Guid id)
         {
-            return await _context.Image
+            return await _context.Images
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<IEnumerable<Image>> GetByEntityIdAsync(Guid entityId)
         {
-            return await _context.Image
+            return await _context.Images
                 .Where(i => i.ExhibitId == entityId)
                 .AsNoTracking()
                 .ToListAsync();
@@ -32,14 +32,14 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task <Guid> CreateAsync(Image image)
         {
-            _context.Image.Add(image);
+            _context.Images.Add(image);
             await _context.SaveChangesAsync();
             return image.Id;
         }
 
         public async Task SetTitleImageAsync(Guid entityId, Guid imageId)
         {
-            var images = await _context.Image
+            var images = await _context.Images
                 .Where(i => i.ExhibitId == entityId)
                 .ToListAsync();
 
@@ -67,13 +67,13 @@ namespace MuseumExhibits.Infrastructure.Repostories
                 throw new KeyNotFoundException($"Image with ID {id} not found.");
             }
 
-            _context.Image.Remove(image);
+            _context.Images.Remove(image);
             await _context.SaveChangesAsync();
         }
 
         public async Task<Image> GetTitleImageByEntityIdAsync(Guid entityId)
         {
-            return await _context.Image
+            return await _context.Images
                 .Where(i => i.ExhibitId == entityId && i.IsTitleImage) 
                 .AsNoTracking()
                 .FirstOrDefaultAsync();

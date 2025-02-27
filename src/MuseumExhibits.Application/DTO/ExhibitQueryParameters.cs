@@ -8,7 +8,7 @@ namespace MuseumExhibits.Application.DTO
         public int? CreationCentury { get; set; }
         public DateOnly? CreationExactDate { get; set; }
         public DateOnly? EntryDate { get; set; }
-        public Guid? CategoryId { get; set; }
+        public string? CategoryName { get; set; }
 
         public string? SortBy { get; set; } = "EntryDate";
         public bool Descending { get; set; } = true;

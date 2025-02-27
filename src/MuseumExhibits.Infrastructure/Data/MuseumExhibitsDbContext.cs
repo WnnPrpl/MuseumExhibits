@@ -9,13 +9,17 @@ namespace MuseumExhibits.Infrastructure.Data
         {
         }
 
-        public DbSet<Exhibit> Exhibit { get; set; }
-        public DbSet<Image> Image { get; set; }
-        public DbSet<Category> Category { get; set; }
+        public DbSet<Exhibit> Exhibits { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Name)
+                .IsUnique();
 
             modelBuilder.Entity<Exhibit>()
                 .HasOne(e => e.Category)

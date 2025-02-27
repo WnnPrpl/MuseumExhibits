@@ -133,8 +133,9 @@ namespace MuseumExhibits.Application.Services
 
         public async Task<IEnumerable<ExhibitDTO>> GetByPage(int page, int pageSize, bool isAdmin)
         {
-            var exhibits = await _exhibitRepository.GetByPageAsync(page, pageSize, isAdmin);
-            return exhibits.Select(exhibit => _mapper.Map<ExhibitDTO>(exhibit));
+            throw new NotImplementedException();
+            //var exhibits = await _exhibitRepository.GetExhibitsAsync(page, pageSize, isAdmin);
+            //return exhibits.Select(exhibit => _mapper.Map<ExhibitDTO>(exhibit));
         }
     }
 

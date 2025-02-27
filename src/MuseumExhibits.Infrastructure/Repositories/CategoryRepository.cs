@@ -16,7 +16,7 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<Category> GetByIdAsync(Guid id)
         {
-            var category = await _context.Category.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
             {
                 throw new KeyNotFoundException($"Category with ID {id} not found.");
@@ -26,31 +26,31 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
-            return await _context.Category.AsNoTracking().ToListAsync();
+            return await _context.Categories.AsNoTracking().ToListAsync();
         }
 
         public async Task<Guid> CreateAsync(Category category)
         {
-            await _context.Category.AddAsync(category);
+            await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
             return category.Id;
         }
 
         public async Task UpdateAsync(Category category)
         {
-            _context.Category.Update(category);
+            _context.Categories.Update(category);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Category category)
         {
-            _context.Category.Remove(category);
+            _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Category>> GetByPageAsync(int page, int pageSize)
         {
-            return await _context.Category
+            return await _context.Categories
                                  .AsNoTracking()
                                  .Skip((page - 1) * pageSize)
                                  .Take(pageSize)

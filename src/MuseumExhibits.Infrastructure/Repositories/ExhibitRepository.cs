@@ -18,7 +18,7 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<Exhibit> GetByIdAsync(Guid id)
         {
-            return await _context.Exhibit
+            return await _context.Exhibits
                 .AsNoTracking()
                 .Include(e => e.Category)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -27,7 +27,7 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<IEnumerable<Exhibit>> GetAllAsync(bool isAdmin)
         {
-            var query = _context.Exhibit.AsQueryable();
+            var query = _context.Exhibits.AsQueryable();
 
             if (!isAdmin)
             {
@@ -41,14 +41,14 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<Guid> CreateAsync(Exhibit exhibit)
         {
-            _context.Exhibit.Add(exhibit);
+            _context.Exhibits.Add(exhibit);
             await _context.SaveChangesAsync();
             return exhibit.Id;
         }
 
         public async Task UpdateAsync(Exhibit exhibit)
         {
-            _context.Exhibit.Update(exhibit);
+            _context.Exhibits.Update(exhibit);
             await _context.SaveChangesAsync();
         }
 
@@ -59,13 +59,13 @@ namespace MuseumExhibits.Infrastructure.Repostories
             {
                 throw new KeyNotFoundException($"Exhibit with ID {id} not found.");
             }
-            _context.Exhibit.Remove(exhibit);
+            _context.Exhibits.Remove(exhibit);
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Exhibit>> GetByCategoryIdAsync(Guid categoryId, bool isAdmin)
         {
-            var query = _context.Exhibit.AsQueryable();
+            var query = _context.Exhibits.AsQueryable();
 
             if (!isAdmin)
             {
@@ -77,7 +77,7 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<(IEnumerable<Exhibit> Exhibits, int TotalCount)> GetExhibitsAsync(ExhibitFilter filter)
         {
-            IQueryable<Exhibit> query = _context.Exhibit.AsNoTracking();
+            IQueryable<Exhibit> query = _context.Exhibits.AsNoTracking();
 
             // Фільтрація
             if (!string.IsNullOrWhiteSpace(filter.Name))
@@ -95,8 +95,8 @@ namespace MuseumExhibits.Infrastructure.Repostories
             if (filter.EntryDate.HasValue)
                 query = query.Where(e => e.EntryDate == filter.EntryDate);
 
-            if (filter.CategoryId.HasValue)
-                query = query.Where(e => e.CategoryId == filter.CategoryId);
+            //if (filter.CategoryId.HasValue)
+            //    query = query.Where(e => e.CategoryId == filter.CategoryId);
 
             // Сортування
             switch (filter.SortBy?.ToLower())
