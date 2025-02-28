@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Models;
 using System.Security.Principal;
+using MuseumExhibits.Core.Filters;
 
 namespace MuseumExhibits.Application.Mapping
 {
@@ -20,6 +21,13 @@ namespace MuseumExhibits.Application.Mapping
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Category != null ? src.Category.Id : (Guid?)null))
                 .ForMember(dest => dest.Category, opt => opt.Ignore());
 
+            CreateMap<Exhibit, ExhibitSummaryDTO>()
+            .ForMember(dest => dest.Category,
+                       opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty));
+
+
+
+
             CreateMap<Category, CategoryDTO>();
             CreateMap<CategoryDTO, Category>()
                 .ForMember(dest => dest.Exhibits, opt => opt.Ignore());
@@ -27,6 +35,9 @@ namespace MuseumExhibits.Application.Mapping
 
             CreateMap<JsonPatchDocument<ExhibitDTO>, JsonPatchDocument<Exhibit>>();
             CreateMap<Operation<ExhibitDTO>, Operation<Exhibit>>();
+
+            CreateMap<ExhibitQueryParameters, ExhibitFilter>();
+
         }
     }
 }

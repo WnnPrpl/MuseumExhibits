@@ -1,7 +1,7 @@
 ﻿
 namespace MuseumExhibits.Application.DTO
 {
-    class ExhibitQueryParameters
+    public class ExhibitQueryParameters
     {
         public string? Name { get; set; }
         public int? CreationYear { get; set; }

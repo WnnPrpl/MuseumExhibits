@@ -34,10 +34,21 @@ namespace MuseumExhibits.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetExhibits([FromQuery] ExhibitQueryParameters queryParams)
         {
-            var exhibits = await _exhibitService.GetAll();
-            return Ok(exhibits);
+            try
+            {
+                var pagedResult = await _exhibitService.Get(queryParams);
+                return Ok(pagedResult);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -96,7 +107,7 @@ namespace MuseumExhibits.API.Controllers
 
             try
             {
-                await _exhibitService.PartialUpdateAsync(id, patchDoc);
+                await _exhibitService.PartialUpdate(id, patchDoc);
                 return NoContent();
             }
 
@@ -128,23 +139,6 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
-        [HttpGet("category/{categoryId:guid}")]
-        public async Task<IActionResult> GetByCategoryId(Guid categoryId)
-        {
-            var exhibits = await _exhibitService.GetByCategoryId(categoryId);
-            return Ok(exhibits);
-        }
 
-        [HttpGet("page")]
-        public async Task<IActionResult> GetByPage(int page = 1, int pageSize = 10)
-        {
-            if (page <= 0 || pageSize <= 0)
-            {
-                return BadRequest("Page and page size must be positive integers.");
-            }
-
-            var exhibits = await _exhibitService.GetByPage(page, pageSize);
-            return Ok(exhibits);
-        }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Abstractions;
+using MuseumExhibits.Core.Filters;
 using MuseumExhibits.Core.Models;
 
 
@@ -35,10 +36,24 @@ namespace MuseumExhibits.Application.Services
             return exhibitDTO;
         }
 
-        public async Task<IEnumerable<ExhibitDTO>> GetAll(bool isAdmin)
+        public async Task<PagedResult<ExhibitDTO>> Get(ExhibitQueryParameters queryParams, bool isAdmin = false)
         {
-            var exhibits = await _exhibitRepository.GetAllAsync(isAdmin);
-            return exhibits.Select(exhibit => _mapper.Map<ExhibitDTO>(exhibit));
+            try
+            {
+                var filters = _mapper.Map<ExhibitFilter>(queryParams);
+
+                var (exhibits, totalCount) = await _exhibitRepository.GetAsync(filters, isAdmin);
+
+                var exhibitDtos = _mapper.Map<IEnumerable<ExhibitDTO>>(exhibits);
+
+                var pagedResult = new PagedResult<ExhibitDTO>(exhibitDtos, totalCount, queryParams.PageNumber, queryParams.PageSize);
+                return pagedResult;
+            }
+
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error while retrieving exhibits.", ex);
+            }
         }
 
         public async Task<Guid> Create(ExhibitDTO exhibitDto)
@@ -77,7 +92,7 @@ namespace MuseumExhibits.Application.Services
             }
         }
 
-        public async Task PartialUpdateAsync(Guid id, JsonPatchDocument<ExhibitDTO> patchDoc)
+        public async Task PartialUpdate(Guid id, JsonPatchDocument<ExhibitDTO> patchDoc)
         {
             try
             {
@@ -125,18 +140,6 @@ namespace MuseumExhibits.Application.Services
             }
         }
 
-        public async Task<IEnumerable<ExhibitDTO>> GetByCategoryId(Guid categoryId, bool isAdmin)
-        {
-            var exhibits = await _exhibitRepository.GetByCategoryIdAsync(categoryId, isAdmin);
-            return exhibits.Select(exhibit => _mapper.Map<ExhibitDTO>(exhibit));
-        }
-
-        public async Task<IEnumerable<ExhibitDTO>> GetByPage(int page, int pageSize, bool isAdmin)
-        {
-            throw new NotImplementedException();
-            //var exhibits = await _exhibitRepository.GetExhibitsAsync(page, pageSize, isAdmin);
-            //return exhibits.Select(exhibit => _mapper.Map<ExhibitDTO>(exhibit));
-        }
     }
 
 }
