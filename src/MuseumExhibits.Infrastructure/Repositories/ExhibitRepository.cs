@@ -18,11 +18,18 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<Exhibit> GetByIdAsync(Guid id)
         {
-            return await _context.Exhibits
-                .AsNoTracking()
-                .Include(e => e.Category)
-                .FirstOrDefaultAsync(e => e.Id == id);
-
+            try
+            {
+                return await _context.Exhibits
+                    .AsNoTracking()
+                    .Include(e => e.Category)
+                    .Include(e => e.Images)
+                    .FirstOrDefaultAsync(e => e.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving exhibit from the database.", ex);
+            }
         }
 
         public async Task<(IEnumerable<Exhibit> Exhibits, int TotalCount)> GetAsync(ExhibitFilter filter, bool isAdmin)
@@ -30,8 +37,9 @@ namespace MuseumExhibits.Infrastructure.Repostories
             try
             {
                 IQueryable<Exhibit> query = _context.Exhibits
+                    .AsNoTracking()
                     .Include(e => e.Category)
-                    .AsNoTracking();
+                    .Include(e => e.Images);
 
                 query = ApplyFiltering(query, filter);
                 query = ApplySorting(query, filter);

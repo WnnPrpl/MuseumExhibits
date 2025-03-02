@@ -1,4 +1,5 @@
-﻿using MuseumExhibits.Application.Abstractions;
+﻿using AutoMapper;
+using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Core.Models;
@@ -10,11 +11,14 @@ namespace MuseumExhibits.Application.Services
     {
         private readonly IImageRepository _imageRepository;
         private readonly ICloudImageClient _cloudImageClient;
+        private readonly IMapper _mapper;
 
-        public ImageService(IImageRepository imageRepository, ICloudImageClient cloudImageClient)
+        public ImageService(IImageRepository imageRepository, ICloudImageClient cloudImageClient, IMapper mapper)
         {
             _imageRepository = imageRepository;
             _cloudImageClient = cloudImageClient;
+            _mapper = mapper;
+
         }
 
         public async Task<IEnumerable<ImageResponse>> GetByEntityId(Guid entityId)
@@ -26,14 +30,7 @@ namespace MuseumExhibits.Application.Services
 
             var images = await _imageRepository.GetByEntityIdAsync(entityId);
 
-            var imageResponses = images?.Select(image => new ImageResponse
-            {
-                Id = image.Id,
-                IsTitleImage = image.IsTitleImage,
-                Url = image.Url
-            }) ?? Enumerable.Empty<ImageResponse>();
-
-            return imageResponses;
+            return images?.Select(img => _mapper.Map<ImageResponse>(img)) ?? Enumerable.Empty<ImageResponse>();
         }
 
         public async Task<ImageResponse> UploadImage(Guid exhibitId, ImageRequest imageRequest)

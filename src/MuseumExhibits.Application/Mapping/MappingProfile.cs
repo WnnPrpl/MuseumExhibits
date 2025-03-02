@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.JsonPatch;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Models;
-using System.Security.Principal;
 using MuseumExhibits.Core.Filters;
 
 namespace MuseumExhibits.Application.Mapping
@@ -12,29 +11,41 @@ namespace MuseumExhibits.Application.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Exhibit, ExhibitDTO>()
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null
-                    ? new CategoryDTO { Id = src.Category.Id, Name = src.Category.Name }
-                    : null));
-
-            CreateMap<ExhibitDTO, Exhibit>()
+            CreateMap<ExhibitRequest, Exhibit>()
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Category != null ? src.Category.Id : (Guid?)null))
                 .ForMember(dest => dest.Category, opt => opt.Ignore());
 
+
+
+            CreateMap<Exhibit, ExhibitResponse>()
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null
+                            ? new CategoryDTO { Id = src.Category.Id, Name = src.Category.Name }
+                            : null))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+
+
+            CreateMap<Operation<ExhibitRequest>, Operation<Exhibit>>();
+
+
             CreateMap<Exhibit, ExhibitSummaryDTO>()
-            .ForMember(dest => dest.Category,
-                       opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty));
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null
+                            ? new CategoryDTO { Id = src.Category.Id, Name = src.Category.Name }
+                            : null))
+                .ForMember(dest => dest.MainImageURL, opt => opt.MapFrom(src =>src.Images != null && src.Images.Any(i => i.IsTitleImage)
+                ? src.Images.First(i => i.IsTitleImage).Url
+                : string.Empty));
 
 
-
+            CreateMap<Image, ImageResponse>();
+                
 
             CreateMap<Category, CategoryDTO>();
             CreateMap<CategoryDTO, Category>()
                 .ForMember(dest => dest.Exhibits, opt => opt.Ignore());
 
 
-            CreateMap<JsonPatchDocument<ExhibitDTO>, JsonPatchDocument<Exhibit>>();
-            CreateMap<Operation<ExhibitDTO>, Operation<Exhibit>>();
+            CreateMap<JsonPatchDocument<ExhibitRequest>, JsonPatchDocument<Exhibit>>();
+
 
             CreateMap<ExhibitQueryParameters, ExhibitFilter>();
 

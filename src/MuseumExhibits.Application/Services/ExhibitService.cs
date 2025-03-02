@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Abstractions;
@@ -23,7 +22,7 @@ namespace MuseumExhibits.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<ExhibitDTO> GetById(Guid id)
+        public async Task<ExhibitResponse> GetById(Guid id)
         {
             var exhibit = await _exhibitRepository.GetByIdAsync(id);
             if (exhibit == null)
@@ -31,12 +30,12 @@ namespace MuseumExhibits.Application.Services
                 throw new ArgumentException("Exhibit not found.");
             }
 
-            var exhibitDTO = _mapper.Map<ExhibitDTO>(exhibit);
+            var exhibitDTO = _mapper.Map<ExhibitResponse>(exhibit);
 
             return exhibitDTO;
         }
 
-        public async Task<PagedResult<ExhibitDTO>> Get(ExhibitQueryParameters queryParams, bool isAdmin = false)
+        public async Task<PagedResult<ExhibitSummaryDTO>> Get(ExhibitQueryParameters queryParams, bool isAdmin = false)
         {
             try
             {
@@ -44,9 +43,9 @@ namespace MuseumExhibits.Application.Services
 
                 var (exhibits, totalCount) = await _exhibitRepository.GetAsync(filters, isAdmin);
 
-                var exhibitDtos = _mapper.Map<IEnumerable<ExhibitDTO>>(exhibits);
+                var exhibitDtos = _mapper.Map<IEnumerable<ExhibitSummaryDTO>>(exhibits);
 
-                var pagedResult = new PagedResult<ExhibitDTO>(exhibitDtos, totalCount, queryParams.PageNumber, queryParams.PageSize);
+                var pagedResult = new PagedResult<ExhibitSummaryDTO>(exhibitDtos, totalCount, queryParams.PageNumber, queryParams.PageSize);
                 return pagedResult;
             }
 
@@ -56,7 +55,7 @@ namespace MuseumExhibits.Application.Services
             }
         }
 
-        public async Task<Guid> Create(ExhibitDTO exhibitDto)
+        public async Task<Guid> Create(ExhibitRequest exhibitDto)
         {
             try
             {
@@ -72,7 +71,7 @@ namespace MuseumExhibits.Application.Services
             }
         }
 
-        public async Task Update(Guid id, ExhibitDTO exhibitDto)
+        public async Task Update(Guid id, ExhibitRequest exhibitDto)
         {
             try
             {
@@ -92,7 +91,7 @@ namespace MuseumExhibits.Application.Services
             }
         }
 
-        public async Task PartialUpdate(Guid id, JsonPatchDocument<ExhibitDTO> patchDoc)
+        public async Task PartialUpdate(Guid id, JsonPatchDocument<ExhibitRequest> patchDoc)
         {
             try
             {

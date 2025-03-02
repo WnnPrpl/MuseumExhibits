@@ -52,7 +52,7 @@ namespace MuseumExhibits.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ExhibitDTO exhibitDto)
+        public async Task<IActionResult> Create([FromBody] ExhibitRequest exhibitDto)
         {
             if (!ModelState.IsValid)
             {
@@ -70,12 +70,8 @@ namespace MuseumExhibits.API.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ExhibitDTO exhibitDto)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ExhibitRequest exhibitDto)
         {
-            if (id != exhibitDto.Id)
-            {
-                return BadRequest("ID mismatch.");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -99,7 +95,7 @@ namespace MuseumExhibits.API.Controllers
 
         [HttpPatch("{id:guid}")]
         [Consumes("application/json-patch+json")]
-        public async Task<IActionResult> PatchExhibit(Guid id, [FromBody] JsonPatchDocument<ExhibitDTO> patchDoc)
+        public async Task<IActionResult> PatchExhibit(Guid id, [FromBody] JsonPatchDocument<ExhibitRequest> patchDoc)
         {
 
             if (patchDoc == null)

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using MuseumExhibits.Application.DTO;
-using MuseumExhibits.Core.Models;
 
 namespace MuseumExhibits.Application.Abstractions
 {

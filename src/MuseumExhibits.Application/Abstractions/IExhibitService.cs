@@ -2,21 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MuseumExhibits.Application.Abstractions
 {
     public interface IExhibitService
     {
-        Task<ExhibitDTO> GetById(Guid id);
-        Task<PagedResult<ExhibitDTO>> Get(ExhibitQueryParameters queryParams, bool isAdmin = false);
-        Task<Guid> Create([FromForm] ExhibitDTO exhibitDto);
-        Task Update(Guid id, ExhibitDTO exhibitDto);
-        Task PartialUpdate(Guid id, JsonPatchDocument<ExhibitDTO> patchDocument);
+        Task<ExhibitResponse> GetById(Guid id);
+        Task<PagedResult<ExhibitSummaryDTO>> Get(ExhibitQueryParameters queryParams, bool isAdmin = false);
+        Task<Guid> Create([FromForm] ExhibitRequest exhibitDto);
+        Task Update(Guid id, ExhibitRequest exhibitDto);
+        Task PartialUpdate(Guid id, JsonPatchDocument<ExhibitRequest> patchDocument);
         Task Delete(Guid id);
         
     }
