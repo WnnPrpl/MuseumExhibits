@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace MuseumExhibits.Application.DTO
 {
     public class ExhibitQueryParameters
@@ -18,7 +20,10 @@ namespace MuseumExhibits.Application.DTO
         public string? SortBy { get; set; } = "EntryDate";
         public bool Descending { get; set; } = true;
 
+        [Range(1, int.MaxValue)]
         public int PageNumber { get; set; } = 1;
+
+        [Range(1, int.MaxValue)]
         public int PageSize { get; set; } = 10;
     }
 }
