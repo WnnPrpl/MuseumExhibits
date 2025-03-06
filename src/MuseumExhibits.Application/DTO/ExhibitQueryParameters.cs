@@ -7,6 +7,11 @@ namespace MuseumExhibits.Application.DTO
         public int? CreationYear { get; set; }
         public int? CreationCentury { get; set; }
         public DateOnly? CreationExactDate { get; set; }
+
+        public int? CreationYearMin { get; set; }
+        public int? CreationYearMax { get; set; }
+
+
         public DateOnly? EntryDate { get; set; }
         public string? CategoryName { get; set; }
 
