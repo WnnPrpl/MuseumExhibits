@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Models;
+using System.Security.Claims;
 
 
 namespace MuseumExhibits.API.Controllers
@@ -38,7 +40,8 @@ namespace MuseumExhibits.API.Controllers
         {
             try
             {
-                var pagedResult = await _exhibitService.Get(queryParams);
+                var isAdmin = IsUserAdmin();
+                var pagedResult = await _exhibitService.Get(queryParams, isAdmin);
                 return Ok(pagedResult);
             }
             catch (ApplicationException ex)
@@ -51,6 +54,7 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ExhibitRequest exhibitDto)
         {
@@ -69,6 +73,7 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ExhibitRequest exhibitDto)
         {
@@ -93,6 +98,7 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPatch("{id:guid}")]
         [Consumes("application/json-patch+json")]
         public async Task<IActionResult> PatchExhibit(Guid id, [FromBody] JsonPatchDocument<ExhibitRequest> patchDoc)
@@ -117,6 +123,7 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -135,6 +142,16 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        private bool IsUserAdmin()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                return roleClaim == "Admin";
+            }
+
+            return false;
+        }
 
     }
 }

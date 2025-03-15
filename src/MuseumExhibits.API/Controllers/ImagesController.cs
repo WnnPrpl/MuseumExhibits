@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
@@ -30,6 +31,7 @@ namespace MuseumExhibits.API.Controllers
             return Ok(imageResponses);
         }
 
+        [Authorize]
         [HttpPost("{entityId}")]
         public async Task<IActionResult> UploadImage(Guid entityId, [FromForm] ImageRequest fileDTO)
         {
@@ -37,6 +39,7 @@ namespace MuseumExhibits.API.Controllers
             return CreatedAtAction(nameof(GetByEntityId), new { entityId = entityId }, imageResponse);
         }
 
+        [Authorize]
         [HttpDelete("{imageId}")]
         public async Task<IActionResult> DeleteImage(Guid imageId)
         {
@@ -44,6 +47,7 @@ namespace MuseumExhibits.API.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("entity/{entityId}")]
         public async Task<IActionResult> DeleteImagesByExhibit(Guid entityId)
         {
@@ -51,6 +55,7 @@ namespace MuseumExhibits.API.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpPut("{entityId}/title/{imageId}")]
         public async Task<IActionResult> SetTitleImage(Guid entityId, Guid imageId)
         {

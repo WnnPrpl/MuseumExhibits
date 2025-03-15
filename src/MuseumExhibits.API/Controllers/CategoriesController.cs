@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Application.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MuseumExhibits.API.Controllers
 {
@@ -37,6 +38,7 @@ namespace MuseumExhibits.API.Controllers
             return Ok(categories);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CategoryDTO categoryDto)
         {
@@ -56,6 +58,7 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] CategoryDTO categoryDto)
         {
@@ -82,6 +85,7 @@ namespace MuseumExhibits.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
