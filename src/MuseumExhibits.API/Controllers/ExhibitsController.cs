@@ -40,7 +40,8 @@ namespace MuseumExhibits.API.Controllers
         {
             try
             {
-                var isAdmin = IsUserAdmin();
+                bool isAdmin = User.Identity?.IsAuthenticated == true;
+
                 var pagedResult = await _exhibitService.Get(queryParams, isAdmin);
                 return Ok(pagedResult);
             }
@@ -140,17 +141,6 @@ namespace MuseumExhibits.API.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
-        }
-
-        private bool IsUserAdmin()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-                return roleClaim == "Admin";
-            }
-
-            return false;
         }
 
     }

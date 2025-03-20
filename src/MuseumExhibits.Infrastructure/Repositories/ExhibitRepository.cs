@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Core.Filters;
 using MuseumExhibits.Core.Models;
@@ -44,12 +43,12 @@ namespace MuseumExhibits.Infrastructure.Repostories
                 query = ApplyFiltering(query, filter);
                 query = ApplySorting(query, filter);
 
-                int totalCount = await query.CountAsync();
-
                 if (!isAdmin)
                 {
                     query = query.Where(e => e.Visible);
                 }
+
+                int totalCount = await query.CountAsync();
 
                 query = query.Skip((filter.PageNumber - 1) * filter.PageSize)
                              .Take(filter.PageSize);
