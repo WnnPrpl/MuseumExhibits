@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Application.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("GlobalLimiter")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;

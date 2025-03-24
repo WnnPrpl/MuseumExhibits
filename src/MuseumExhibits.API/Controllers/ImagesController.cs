@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 
@@ -8,6 +9,7 @@ namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("GlobalLimiter")]
     public class ImagesController : ControllerBase
     {
         private readonly IImageService _imageService;

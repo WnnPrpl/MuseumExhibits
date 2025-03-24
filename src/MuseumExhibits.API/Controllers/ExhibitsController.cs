@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Models;
@@ -12,6 +13,7 @@ namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("GlobalLimiter")]
     public class ExhibitsController : ControllerBase
     {
         private readonly IExhibitService _exhibitService;

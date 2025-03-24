@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MuseumExhibits.Infrastructure.Repositories;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -116,6 +118,27 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("GlobalLimiter", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 100;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+    });
+
+    options.AddTokenBucketLimiter("LoginLimiter", limiterOptions =>
+    {
+        limiterOptions.TokenLimit = 10;
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(5);
+        limiterOptions.TokensPerPeriod = 1;
+        limiterOptions.QueueLimit = 0;
+    });
+});
+
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -127,6 +150,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

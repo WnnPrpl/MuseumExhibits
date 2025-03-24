@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 
@@ -6,6 +7,7 @@ namespace MuseumExhibits.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("LoginLimiter")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -31,7 +33,7 @@ namespace MuseumExhibits.API.Controllers
                 if (ex.Message.Contains("already exist"))
                     return Conflict(new { Error = ex.Message });
 
-                return StatusCode(500, new { Error = "An error occurred while processing your request.", Details = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
@@ -51,7 +53,7 @@ namespace MuseumExhibits.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = "An error occurred while processing your request.", Details = ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
     }
