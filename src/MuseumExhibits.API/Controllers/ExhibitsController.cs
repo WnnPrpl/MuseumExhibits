@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
-using MuseumExhibits.Core.Models;
-using System.Security.Claims;
 
 
 namespace MuseumExhibits.API.Controllers
@@ -65,7 +62,8 @@ namespace MuseumExhibits.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-                        try
+
+            try
             {
                 var id = await _exhibitService.Create(exhibitDto);
                 return CreatedAtAction(nameof(GetById), new { id }, id);

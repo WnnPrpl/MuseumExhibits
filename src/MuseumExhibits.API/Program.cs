@@ -86,8 +86,9 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
 builder.Services.AddDbContext<MuseumExhibitsDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
+    options.UseSqlServer(configuration.GetConnectionString("MsSqlConnection")));
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IExhibitRepository, ExhibitRepository>();
