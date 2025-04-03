@@ -22,15 +22,8 @@ namespace MuseumExhibits.API.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CategoryDTO>> GetById(Guid id)
         {
-            try
-            {
-                var category = await _categoryService.GetById(id);
-                return Ok(category);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            var category = await _categoryService.GetById(id);
+            return Ok(category);
         }
 
         [HttpGet]
@@ -49,22 +42,16 @@ namespace MuseumExhibits.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            try
-            {
-                Guid categoryId = await _categoryService.Create(categoryDto);
-                return CreatedAtAction(nameof(GetById), new { id = categoryId }, categoryId);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            categoryDto.Id = Guid.NewGuid();
+
+            Guid categoryId = await _categoryService.Create(categoryDto);
+            return CreatedAtAction(nameof(GetById), new { id = categoryId }, categoryId);
         }
 
         [Authorize]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] CategoryDTO categoryDto)
         {
-
             categoryDto.Id = id;
 
             if (!ModelState.IsValid)
@@ -72,34 +59,16 @@ namespace MuseumExhibits.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            try
-            {
-                await _categoryService.Update(id, categoryDto);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            await _categoryService.Update(id, categoryDto);
+            return NoContent();
         }
 
         [Authorize]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                await _categoryService.Delete(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _categoryService.Delete(id);
+            return NoContent();
         }
 
         [HttpGet("paged")]

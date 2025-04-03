@@ -17,9 +17,11 @@ namespace MuseumExhibits.Infrastructure.Cloud
            
         public async Task<UploadImageResult> UploadImageAsync(IFormFile file, string folderPath)
         {
+            using var fileStream = file.OpenReadStream();
+
             var uploadParams = new ImageUploadParams
             {
-                File = new FileDescription(file.FileName, file.OpenReadStream()),
+                File = new FileDescription(file.FileName, fileStream),
                 Folder = folderPath
             };
 

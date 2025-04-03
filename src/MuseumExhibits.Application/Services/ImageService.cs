@@ -30,7 +30,7 @@ namespace MuseumExhibits.Application.Services
 
             var images = await _imageRepository.GetByEntityIdAsync(entityId);
 
-            return images?.Select(img => _mapper.Map<ImageResponse>(img)) ?? Enumerable.Empty<ImageResponse>();
+            return images.Select(img => _mapper.Map<ImageResponse>(img));
         }
 
         public async Task<ImageResponse> UploadImage(Guid exhibitId, ImageRequest imageRequest)
@@ -60,12 +60,7 @@ namespace MuseumExhibits.Application.Services
 
                 await transaction.CommitAsync();
 
-                return new ImageResponse
-                {
-                    Id = image.Id,
-                    IsTitleImage = image.IsTitleImage,
-                    Url = image.Url
-                };
+                return _mapper.Map<ImageResponse>(image);
             }
             catch (Exception ex)
             {
@@ -110,10 +105,11 @@ namespace MuseumExhibits.Application.Services
             {
                 var images = await _imageRepository.GetByEntityIdAsync(entityId);
 
-                var deleteTasks = images.Select(image =>
-                    RetryOperationAsync(() => _cloudImageClient.DeleteImageAsync(image.PublicId), 2)
-                        .ContinueWith(_ => _imageRepository.DeleteAsync(image.Id))
-                ).ToList();
+                var deleteTasks = images.Select(async image =>
+                {
+                    await RetryOperationAsync(() => _cloudImageClient.DeleteImageAsync(image.PublicId), 2);
+                    await _imageRepository.DeleteAsync(image.Id);
+                }).ToList();
 
                 await Task.WhenAll(deleteTasks);
 

@@ -17,49 +17,42 @@ namespace MuseumExhibits.Infrastructure.Repostories
 
         public async Task<Exhibit> GetByIdAsync(Guid id)
         {
-            try
+            var exhibit = await _context.Exhibits
+                .AsNoTracking()
+                .Include(e => e.Category)
+                .Include(e => e.Images)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (exhibit == null)
             {
-                return await _context.Exhibits
-                    .AsNoTracking()
-                    .Include(e => e.Category)
-                    .Include(e => e.Images)
-                    .FirstOrDefaultAsync(e => e.Id == id);
+                throw new KeyNotFoundException($"Exhibit with ID {id} not found.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving exhibit from the database.", ex);
-            }
+            return exhibit;
         }
 
         public async Task<(IEnumerable<Exhibit> Exhibits, int TotalCount)> GetAsync(ExhibitFilter filter, bool isAdmin)
         {
-            try
+
+            IQueryable<Exhibit> query = _context.Exhibits
+                .AsNoTracking()
+                .Include(e => e.Category)
+                .Include(e => e.Images);
+
+            query = ApplyFiltering(query, filter);
+            query = ApplySorting(query, filter);
+
+            if (!isAdmin)
             {
-                IQueryable<Exhibit> query = _context.Exhibits
-                    .AsNoTracking()
-                    .Include(e => e.Category)
-                    .Include(e => e.Images);
-
-                query = ApplyFiltering(query, filter);
-                query = ApplySorting(query, filter);
-
-                if (!isAdmin)
-                {
-                    query = query.Where(e => e.Visible);
-                }
-
-                int totalCount = await query.CountAsync();
-
-                query = query.Skip((filter.PageNumber - 1) * filter.PageSize)
-                             .Take(filter.PageSize);
-
-                var exhibits = await query.ToListAsync();
-                return (exhibits, totalCount);
+                query = query.Where(e => e.Visible);
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving exhibits from the database.", ex);
-            }
+
+            int totalCount = await query.CountAsync();
+
+            query = query.Skip((filter.PageNumber - 1) * filter.PageSize)
+                         .Take(filter.PageSize);
+
+            var exhibits = await query.ToListAsync();
+            return (exhibits, totalCount);
         }
 
         private IQueryable<Exhibit> ApplyFiltering(IQueryable<Exhibit> query, ExhibitFilter filter)
@@ -169,7 +162,6 @@ namespace MuseumExhibits.Infrastructure.Repostories
             _context.Exhibits.Remove(exhibit);
             await _context.SaveChangesAsync();
         }
-       
 
     }
 }

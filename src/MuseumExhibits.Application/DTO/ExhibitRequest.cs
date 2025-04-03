@@ -120,7 +120,7 @@ namespace MuseumExhibits.Application.DTO
         [StringLength(100)]
         public string? Technique { get; set; }
 
-        public CategoryDTO? Category { get; set; }
+        public Guid? CategoryId { get; set; }
 
         [StringLength(500)]
         public string? DiscoveryTimeAndPlace { get; set; }

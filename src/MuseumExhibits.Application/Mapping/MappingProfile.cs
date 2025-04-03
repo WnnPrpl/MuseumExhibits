@@ -12,10 +12,9 @@ namespace MuseumExhibits.Application.Mapping
         public MappingProfile()
         {
             CreateMap<ExhibitRequest, Exhibit>()
-                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Category != null ? src.Category.Id : (Guid?)null))
                 .ForMember(dest => dest.Category, opt => opt.Ignore());
 
-
+            CreateMap<Exhibit, ExhibitRequest>().ReverseMap();
 
             CreateMap<Exhibit, ExhibitResponse>()
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null
@@ -45,7 +44,6 @@ namespace MuseumExhibits.Application.Mapping
 
 
             CreateMap<JsonPatchDocument<ExhibitRequest>, JsonPatchDocument<Exhibit>>();
-
 
             CreateMap<ExhibitQueryParameters, ExhibitFilter>();
 
