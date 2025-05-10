@@ -5,7 +5,7 @@ using MuseumExhibits.Application.DTO;
 
 namespace MuseumExhibits.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     [EnableRateLimiting("LoginLimiter")]
     public class AuthController : ControllerBase
@@ -17,25 +17,25 @@ namespace MuseumExhibits.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            try
-            {
-                var token = await _authService.RegisterAsync(request);
-                return Ok(new { Token = token });
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("already exist"))
-                    return Conflict(new { Error = ex.Message });
+        //    try
+        //    {
+        //        var token = await _authService.RegisterAsync(request);
+        //        return Ok(new { Token = token });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        if (ex.Message.Contains("already exist"))
+        //            return Conflict(new { Error = ex.Message });
 
-                return StatusCode(500, new { message = ex.Message });
-            }
-        }
+        //        return StatusCode(500, new { message = ex.Message });
+        //    }
+        //}
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [EnableRateLimiting("GlobalLimiter")]
     public class CategoriesController : ControllerBase
     {

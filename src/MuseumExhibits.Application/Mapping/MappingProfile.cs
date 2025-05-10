@@ -27,9 +27,9 @@ namespace MuseumExhibits.Application.Mapping
 
 
             CreateMap<Exhibit, ExhibitSummaryDTO>()
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null
-                            ? new CategoryDTO { Id = src.Category.Id, Name = src.Category.Name }
-                            : null))
+                //.ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null
+                //            ? new CategoryDTO { Id = src.Category.Id, Name = src.Category.Name }
+                //            : null))
                 .ForMember(dest => dest.MainImageURL, opt => opt.MapFrom(src =>src.Images != null && src.Images.Any(i => i.IsTitleImage)
                 ? src.Images.First(i => i.IsTitleImage).Url
                 : string.Empty));

@@ -9,7 +9,7 @@ using MuseumExhibits.Application.DTO;
 namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/exhibits")]
     [EnableRateLimiting("GlobalLimiter")]
     public class ExhibitsController : ControllerBase
     {

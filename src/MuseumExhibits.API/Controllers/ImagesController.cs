@@ -8,7 +8,7 @@ using MuseumExhibits.Application.DTO;
 namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/images")]
     [EnableRateLimiting("GlobalLimiter")]
     public class ImagesController : ControllerBase
     {

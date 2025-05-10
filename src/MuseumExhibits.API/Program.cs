@@ -23,7 +23,7 @@ var configuration = builder.Configuration;
 var jwtSecret = configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrEmpty(jwtSecret))
 {
-    throw new InvalidOperationException("JwtSettings:SecretKey не заданий у конфігурації.");
+    throw new InvalidOperationException("JwtSettings:SecretKey is not set in the configuration.");
 }
 
 var key = Encoding.UTF8.GetBytes(jwtSecret);

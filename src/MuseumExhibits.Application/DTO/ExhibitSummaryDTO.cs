@@ -5,7 +5,8 @@ namespace MuseumExhibits.Application.DTO
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string MainImageURL { get; set; }
-        public CategoryDTO Category { get; set; }
+        public string? MainImageURL { get; set; }
+        public string? ShortDescription { get; set; }
+        ///public CategoryDTO Category { get; set; }
     }
 }
