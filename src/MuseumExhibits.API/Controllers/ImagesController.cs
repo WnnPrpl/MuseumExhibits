@@ -20,7 +20,7 @@ namespace MuseumExhibits.API.Controllers
         }
 
         [HttpGet("{entityId}")]
-        public async Task<IActionResult> GetByEntityId(Guid entityId)
+        public async Task<ActionResult> GetByEntityId(Guid entityId)
         {
             var images = await _imageService.GetByEntityId(entityId);
             var imageResponses = images.Select(img => new ImageResponse
@@ -35,7 +35,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpPost("{entityId}")]
-        public async Task<IActionResult> UploadImage(Guid entityId, [FromForm] ImageRequest fileDTO)
+        public async Task<ActionResult> UploadImage(Guid entityId, [FromForm] ImageRequest fileDTO)
         {
             var imageResponse = await _imageService.UploadImage(entityId, fileDTO);
             return CreatedAtAction(nameof(GetByEntityId), new { entityId = entityId }, imageResponse);
@@ -43,7 +43,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpDelete("{imageId}")]
-        public async Task<IActionResult> DeleteImage(Guid imageId)
+        public async Task<ActionResult> DeleteImage(Guid imageId)
         {
             await _imageService.DeleteImage(imageId);
             return NoContent();
@@ -51,7 +51,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpDelete("entity/{entityId}")]
-        public async Task<IActionResult> DeleteImagesByExhibit(Guid entityId)
+        public async Task<ActionResult> DeleteImagesByExhibit(Guid entityId)
         {
             await _imageService.DeleteByEntityId(entityId);
             return NoContent();
@@ -59,7 +59,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpPut("{entityId}/title/{imageId}")]
-        public async Task<IActionResult> SetTitleImage(Guid entityId, Guid imageId)
+        public async Task<ActionResult> SetTitleImage(Guid entityId, Guid imageId)
         {
             await _imageService.SetTitleImage(entityId, imageId);
             return NoContent();

@@ -50,7 +50,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] CategoryDTO categoryDto)
+        public async Task<ActionResult> Update(Guid id, [FromBody] CategoryDTO categoryDto)
         {
             categoryDto.Id = id;
 
@@ -65,14 +65,14 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             await _categoryService.Delete(id);
             return NoContent();
         }
 
         [HttpGet("paged")]
-        public async Task<IActionResult> GetByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult> GetByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (page < 1 || pageSize < 1)
                 return BadRequest("Page and page size must be greater than zero.");

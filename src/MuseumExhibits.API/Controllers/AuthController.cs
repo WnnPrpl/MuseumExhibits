@@ -18,7 +18,7 @@ namespace MuseumExhibits.API.Controllers
         }
 
         //[HttpPost("register")]
-        //public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        //public async Task<ActionResult> Register([FromBody] RegisterRequest request)
         //{
         //    if (!ModelState.IsValid)
         //        return BadRequest(ModelState);
@@ -38,7 +38,7 @@ namespace MuseumExhibits.API.Controllers
         //}
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult> Login([FromBody] LoginRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

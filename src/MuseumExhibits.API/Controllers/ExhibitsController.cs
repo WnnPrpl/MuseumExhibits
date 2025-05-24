@@ -21,14 +21,14 @@ namespace MuseumExhibits.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<ActionResult> GetById(Guid id)
         {
             var exhibit = await _exhibitService.GetById(id);
             return Ok(exhibit);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] ExhibitQueryParameters queryParams)
+        public async Task<ActionResult> Get([FromQuery] ExhibitQueryParameters queryParams)
         {
             bool isAdmin = User.Identity?.IsAuthenticated == true;
             var pagedResult = await _exhibitService.Get(queryParams, isAdmin);
@@ -37,7 +37,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ExhibitRequest exhibitDto)
+        public async Task<ActionResult> Create([FromBody] ExhibitRequest exhibitDto)
         {
             if (!ModelState.IsValid)
             {
@@ -50,7 +50,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ExhibitRequest exhibitDto)
+        public async Task<ActionResult> Update(Guid id, [FromBody] ExhibitRequest exhibitDto)
         {
             if (!ModelState.IsValid)
             {
@@ -64,7 +64,7 @@ namespace MuseumExhibits.API.Controllers
         [Authorize]
         [HttpPatch("{id:guid}")]
         [Consumes("application/json-patch+json")]
-        public async Task<IActionResult> Patch(Guid id, [FromBody] JsonPatchDocument<ExhibitRequest> patchDoc)
+        public async Task<ActionResult> Patch(Guid id, [FromBody] JsonPatchDocument<ExhibitRequest> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest("Invalid patch data.");
@@ -75,7 +75,7 @@ namespace MuseumExhibits.API.Controllers
 
         [Authorize]
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             await _exhibitService.Delete(id);
             return NoContent();
