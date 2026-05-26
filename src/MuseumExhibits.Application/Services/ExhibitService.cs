@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using MuseumExhibits.Application.Abstractions;
@@ -7,35 +7,27 @@ using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Core.Filters;
 using MuseumExhibits.Core.Models;
 
-
 namespace MuseumExhibits.Application.Services
 {
-    public class ExhibitService : IExhibitService
+    public class ExhibitService(
+        IExhibitRepository exhibitRepository,
+        ICategoryService categoryService,
+        IImageService imageService,
+        IMapper mapper) : IExhibitService
     {
-        private readonly IExhibitRepository _exhibitRepository;
-        public readonly ICategoryService _categoryService;
-        private readonly IImageService _imageService;
-        private readonly IMapper _mapper;
-
-        public ExhibitService(IExhibitRepository exhibitRepository, ICategoryService categoryService, IImageService imageService, IMapper mapper)
-        {
-            _exhibitRepository = exhibitRepository;
-            _categoryService = categoryService;
-            _imageService = imageService;
-            _mapper = mapper;
-        }
+        private readonly IExhibitRepository _exhibitRepository = exhibitRepository;
+        private readonly ICategoryService _categoryService = categoryService;
+        private readonly IImageService _imageService = imageService;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<ExhibitResponse> GetById(Guid id)
         {
             var exhibit = await _exhibitRepository.GetByIdAsync(id);
-            var exhibitDTO = _mapper.Map<ExhibitResponse>(exhibit);
-
-            return exhibitDTO;
+            return _mapper.Map<ExhibitResponse>(exhibit);
         }
 
         public async Task<PagedResult<ExhibitSummaryDTO>> Get(ExhibitQueryParameters queryParams, bool isAdmin = false)
         {
-
             var filters = _mapper.Map<ExhibitFilter>(queryParams);
             var (exhibits, totalCount) = await _exhibitRepository.GetAsync(filters, isAdmin);
             var exhibitDtos = _mapper.Map<IEnumerable<ExhibitSummaryDTO>>(exhibits);
@@ -46,9 +38,7 @@ namespace MuseumExhibits.Application.Services
         public async Task<Guid> Create(ExhibitRequest exhibitDto)
         {
             if (exhibitDto.CategoryId != null)
-            {
-                var category = await _categoryService.GetById((Guid)exhibitDto.CategoryId);
-            }
+                await _categoryService.GetById((Guid)exhibitDto.CategoryId);
 
             var exhibit = _mapper.Map<Exhibit>(exhibitDto);
             await _exhibitRepository.CreateAsync(exhibit);
@@ -102,17 +92,13 @@ namespace MuseumExhibits.Application.Services
 
         public async Task Delete(Guid id)
         {
-            var exhibit = await _exhibitRepository.GetByIdAsync(id);
+            await _exhibitRepository.GetByIdAsync(id);
 
             var images = await _imageService.GetByEntityId(id);
-
             if (images.Any())
-            {
                 await _imageService.DeleteByEntityId(id);
-            }
 
             await _exhibitRepository.DeleteAsync(id);
         }
     }
-
 }

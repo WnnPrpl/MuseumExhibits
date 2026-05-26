@@ -1,23 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Core.Models;
 using MuseumExhibits.Infrastructure.Data;
 
 namespace MuseumExhibits.Infrastructure.Repositories
 {
-    public class AdminRepository : IAdminRepository
+    public class AdminRepository(MuseumExhibitsDbContext context) : IAdminRepository
     {
-        private readonly MuseumExhibitsDbContext _context;
+        private readonly MuseumExhibitsDbContext _context = context;
 
-        public AdminRepository(MuseumExhibitsDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<Admin> GetByEmailAsync(string email)
-        {
-            return await _context.Admins.FirstOrDefaultAsync(a => a.Email == email);
-        }
+        public async Task<Admin?> GetByEmailAsync(string email) =>
+            await _context.Admins.FirstOrDefaultAsync(a => a.Email == email);
 
         public async Task CreateAsync(Admin admin)
         {

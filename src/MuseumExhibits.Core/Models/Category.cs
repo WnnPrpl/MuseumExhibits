@@ -8,6 +8,6 @@ namespace MuseumExhibits.Core.Models
         [Required]
         public string Name { get; set; }
         //public string Description { get; set; }
-        public List<Exhibit> Exhibits { get; set; } = new List<Exhibit>(); 
+        public List<Exhibit> Exhibits { get; set; } = [];
     }
 }

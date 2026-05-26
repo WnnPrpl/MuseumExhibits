@@ -1,14 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MuseumExhibits.Core.Models;
 
 namespace MuseumExhibits.Infrastructure.Data
 {
-    public class MuseumExhibitsDbContext : DbContext
+    public class MuseumExhibitsDbContext(DbContextOptions<MuseumExhibitsDbContext> options) : DbContext(options)
     {
-        public MuseumExhibitsDbContext(DbContextOptions<MuseumExhibitsDbContext> options) : base(options)
-        {
-        }
-
         public DbSet<Exhibit> Exhibits { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -33,7 +29,6 @@ namespace MuseumExhibits.Infrastructure.Data
                 .WithMany(e => e.Images)
                 .HasForeignKey(i => i.ExhibitId)
                 .OnDelete(DeleteBehavior.Cascade);
-
         }
     }
 }

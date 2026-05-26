@@ -1,23 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MuseumExhibits.Application.DTO;
-using MuseumExhibits.Application.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using MuseumExhibits.Application.Abstractions;
+using MuseumExhibits.Application.DTO;
 
 namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
     [Route("api/categories")]
     [EnableRateLimiting("GlobalLimiter")]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController(ICategoryService categoryService) : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
-
-        public CategoriesController(ICategoryService service)
-        {
-            _categoryService = service;
-        }
+        private readonly ICategoryService _categoryService = categoryService;
 
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CategoryDTO>> GetById(Guid id)
@@ -38,9 +32,7 @@ namespace MuseumExhibits.API.Controllers
         public async Task<ActionResult> Create([FromBody] CategoryDTO categoryDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             categoryDto.Id = Guid.NewGuid();
 
@@ -55,9 +47,7 @@ namespace MuseumExhibits.API.Controllers
             categoryDto.Id = id;
 
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             await _categoryService.Update(id, categoryDto);
             return NoContent();
@@ -81,5 +71,4 @@ namespace MuseumExhibits.API.Controllers
             return Ok(paginatedCategories);
         }
     }
-
 }

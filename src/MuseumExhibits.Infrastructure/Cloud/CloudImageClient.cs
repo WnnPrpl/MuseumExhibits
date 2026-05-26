@@ -1,20 +1,14 @@
-﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using MuseumExhibits.Core.Abstractions;
 
-
 namespace MuseumExhibits.Infrastructure.Cloud
 {
-    public class CloudImageClient : ICloudImageClient
+    public class CloudImageClient(Cloudinary cloudinary) : ICloudImageClient
     {
-        private readonly Cloudinary _cloudinary;
+        private readonly Cloudinary _cloudinary = cloudinary;
 
-        public CloudImageClient(Cloudinary cloudinary)
-        {
-            _cloudinary = cloudinary;
-        }
-           
         public async Task<UploadImageResult> UploadImageAsync(IFormFile file, string folderPath)
         {
             using var fileStream = file.OpenReadStream();
@@ -28,9 +22,7 @@ namespace MuseumExhibits.Infrastructure.Cloud
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
             if (uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
-            {
                 throw new Exception("Failed to upload image to Cloudinary");
-            }
 
             return new UploadImageResult
             {
@@ -44,9 +36,7 @@ namespace MuseumExhibits.Infrastructure.Cloud
             var deleteResult = await _cloudinary.DestroyAsync(new DeletionParams(publicId));
 
             if (deleteResult.Result != "ok")
-            {
                 throw new Exception("Failed to delete image from Cloudinary");
-            }
         }
     }
 }

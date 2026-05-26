@@ -1,24 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 
-
 namespace MuseumExhibits.API.Controllers
 {
     [ApiController]
     [Route("api/exhibits")]
     [EnableRateLimiting("GlobalLimiter")]
-    public class ExhibitsController : ControllerBase
+    public class ExhibitsController(IExhibitService exhibitService) : ControllerBase
     {
-        private readonly IExhibitService _exhibitService;
-
-        public ExhibitsController(IExhibitService exhibitService)
-        {
-            _exhibitService = exhibitService;
-        }
+        private readonly IExhibitService _exhibitService = exhibitService;
 
         [HttpGet("{id:guid}")]
         public async Task<ActionResult> GetById(Guid id)
@@ -40,9 +34,7 @@ namespace MuseumExhibits.API.Controllers
         public async Task<ActionResult> Create([FromBody] ExhibitRequest exhibitDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var id = await _exhibitService.Create(exhibitDto);
             return CreatedAtAction(nameof(GetById), new { id }, id);
@@ -53,9 +45,7 @@ namespace MuseumExhibits.API.Controllers
         public async Task<ActionResult> Update(Guid id, [FromBody] ExhibitRequest exhibitDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             await _exhibitService.Update(id, exhibitDto);
             return NoContent();
@@ -80,6 +70,5 @@ namespace MuseumExhibits.API.Controllers
             await _exhibitService.Delete(id);
             return NoContent();
         }
-
     }
 }

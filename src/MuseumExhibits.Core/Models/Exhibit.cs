@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Principal;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MuseumExhibits.Core.Models
 {
@@ -104,7 +102,7 @@ namespace MuseumExhibits.Core.Models
         public int? CreationYear { get; set; }
         public int? CreationCentury { get; set; }
 
-        public List<Image> Images { get; set; } = new List<Image>();
+        public List<Image> Images { get; set; } = [];
 
         public bool Visible { get; set; } = false;
     }

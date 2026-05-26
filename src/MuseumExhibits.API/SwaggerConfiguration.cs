@@ -39,7 +39,7 @@ namespace MuseumExhibits.API
                             Id = "Bearer"
                         }
                     },
-                    new string[] { }
+                    []
                 }
             });
 

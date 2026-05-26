@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MuseumExhibits.Application.Abstractions;
 using MuseumExhibits.Application.DTO;
 using MuseumExhibits.Core.Abstractions;
@@ -6,16 +6,10 @@ using MuseumExhibits.Core.Models;
 
 namespace MuseumExhibits.Application.Services
 {
-    public class CategoryService : ICategoryService
+    public class CategoryService(ICategoryRepository repository, IMapper mapper) : ICategoryService
     {
-        private readonly ICategoryRepository _repository;
-        private readonly IMapper _mapper;
-
-        public CategoryService(ICategoryRepository repository, IMapper mapper)
-        {
-            _repository = repository;
-            _mapper = mapper;
-        }
+        private readonly ICategoryRepository _repository = repository;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<CategoryDTO> GetById(Guid id)
         {
@@ -39,14 +33,12 @@ namespace MuseumExhibits.Application.Services
         {
             var category = await _repository.GetByIdAsync(id);
             _mapper.Map(categoryDto, category);
-
             await _repository.UpdateAsync(category);
         }
 
         public async Task Delete(Guid id)
         {
             var category = await _repository.GetByIdAsync(id);
-
             await _repository.DeleteAsync(category);
         }
 
@@ -55,6 +47,5 @@ namespace MuseumExhibits.Application.Services
             var categories = await _repository.GetByPageAsync(page, pageSize);
             return categories.Select(c => _mapper.Map<CategoryDTO>(c)).ToList();
         }
-
     }
 }

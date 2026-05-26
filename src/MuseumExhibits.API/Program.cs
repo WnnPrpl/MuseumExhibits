@@ -5,7 +5,6 @@ using MuseumExhibits.Application.Mapping;
 using MuseumExhibits.Application.Services;
 using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Infrastructure.Cloud;
-using MuseumExhibits.Infrastructure.Repostories;
 using MuseumExhibits.Infrastructure.Data;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

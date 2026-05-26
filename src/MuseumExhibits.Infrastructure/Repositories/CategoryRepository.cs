@@ -1,33 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Core.Models;
 using MuseumExhibits.Infrastructure.Data;
 
-namespace MuseumExhibits.Infrastructure.Repostories
+namespace MuseumExhibits.Infrastructure.Repositories
 {
-    public class CategoryRepository : ICategoryRepository
+    public class CategoryRepository(MuseumExhibitsDbContext context) : ICategoryRepository
     {
-        private readonly MuseumExhibitsDbContext _context;
-
-        public CategoryRepository(MuseumExhibitsDbContext context)
-        {
-            _context = context;
-        }
+        private readonly MuseumExhibitsDbContext _context = context;
 
         public async Task<Category> GetByIdAsync(Guid id)
         {
             var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
-            {
                 throw new KeyNotFoundException($"Category with ID {id} not found.");
-            }
+
             return category;
         }
 
-        public async Task<IEnumerable<Category>> GetAllAsync()
-        {
-            return await _context.Categories.AsNoTracking().ToListAsync();
-        }
+        public async Task<IEnumerable<Category>> GetAllAsync() =>
+            await _context.Categories.AsNoTracking().ToListAsync();
 
         public async Task<Guid> CreateAsync(Category category)
         {
@@ -48,13 +40,11 @@ namespace MuseumExhibits.Infrastructure.Repostories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Category>> GetByPageAsync(int page, int pageSize)
-        {
-            return await _context.Categories
-                                 .AsNoTracking()
-                                 .Skip((page - 1) * pageSize)
-                                 .Take(pageSize)
-                                 .ToListAsync();
-        }
+        public async Task<IEnumerable<Category>> GetByPageAsync(int page, int pageSize) =>
+            await _context.Categories
+                .AsNoTracking()
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
     }
 }

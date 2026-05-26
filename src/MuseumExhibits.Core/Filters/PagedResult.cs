@@ -1,21 +1,12 @@
-﻿
+
 namespace MuseumExhibits.Core.Filters
 {
-    public class PagedResult<T>
+    public record PagedResult<T>(
+        IEnumerable<T> Items,
+        int TotalCount,
+        int PageNumber,
+        int PageSize)
     {
-        public IEnumerable<T> Items { get; }
-        public int TotalCount { get; }
-        public int TotalPages { get; }
-        public int PageNumber { get; }
-        public int PageSize { get; }
-
-        public PagedResult(IEnumerable<T> items, int totalCount, int pageNumber, int pageSize)
-        {
-            Items = items;
-            TotalCount = totalCount;
-            PageNumber = pageNumber;
-            PageSize = pageSize;
-            TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-        }
+        public int TotalPages { get; } = (int)Math.Ceiling(TotalCount / (double)PageSize);
     }
 }

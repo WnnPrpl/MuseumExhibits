@@ -1,20 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 using MuseumExhibits.Core.Abstractions;
-
 
 namespace MuseumExhibits.Infrastructure.Data
 {
-    public class EfCoreTransaction : ITransaction
+    public class EfCoreTransaction(IDbContextTransaction transaction) : ITransaction
     {
-        private readonly IDbContextTransaction _transaction;
-
-        public EfCoreTransaction(IDbContextTransaction transaction)
-        {
-            _transaction = transaction;
-        }
-
-        public Task CommitAsync() => _transaction.CommitAsync();
-        public Task RollbackAsync() => _transaction.RollbackAsync();
-        public async ValueTask DisposeAsync() => await _transaction.DisposeAsync();
+        public Task CommitAsync() => transaction.CommitAsync();
+        public Task RollbackAsync() => transaction.RollbackAsync();
+        public async ValueTask DisposeAsync() => await transaction.DisposeAsync();
     }
 }

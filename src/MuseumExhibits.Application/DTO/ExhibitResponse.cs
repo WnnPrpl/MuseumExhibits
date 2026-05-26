@@ -49,6 +49,6 @@ namespace MuseumExhibits.Application.DTO
         public int? CreationCentury { get; set; }
         public bool Visible { get; set; }
 
-        public List<ImageResponse> Images { get; set; } = new List<ImageResponse>();
+        public List<ImageResponse> Images { get; set; } = [];
     }
 }

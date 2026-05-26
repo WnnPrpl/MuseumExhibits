@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using MuseumExhibits.Application.Abstractions;
@@ -10,14 +9,9 @@ namespace MuseumExhibits.API.Controllers
     [ApiController]
     [Route("api/images")]
     [EnableRateLimiting("GlobalLimiter")]
-    public class ImagesController : ControllerBase
+    public class ImagesController(IImageService imageService) : ControllerBase
     {
-        private readonly IImageService _imageService;
-
-        public ImagesController(IImageService imageService)
-        {
-            _imageService = imageService;
-        }
+        private readonly IImageService _imageService = imageService;
 
         [HttpGet("{entityId}")]
         public async Task<ActionResult> GetByEntityId(Guid entityId)
@@ -38,7 +32,7 @@ namespace MuseumExhibits.API.Controllers
         public async Task<ActionResult> UploadImage(Guid entityId, [FromForm] ImageRequest fileDTO)
         {
             var imageResponse = await _imageService.UploadImage(entityId, fileDTO);
-            return CreatedAtAction(nameof(GetByEntityId), new { entityId = entityId }, imageResponse);
+            return CreatedAtAction(nameof(GetByEntityId), new { entityId }, imageResponse);
         }
 
         [Authorize]
@@ -65,5 +59,4 @@ namespace MuseumExhibits.API.Controllers
             return NoContent();
         }
     }
-
 }
