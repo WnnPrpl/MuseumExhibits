@@ -1,40 +1,36 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using MuseumExhibits.Application.Abstractions;
+using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MuseumExhibits.API;
+using MuseumExhibits.API.Endpoints;
 using MuseumExhibits.Application.Mapping;
 using MuseumExhibits.Application.Services;
 using MuseumExhibits.Core.Abstractions;
 using MuseumExhibits.Infrastructure.Cloud;
 using MuseumExhibits.Infrastructure.Data;
-using CloudinaryDotNet;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using MuseumExhibits.Infrastructure.Repositories;
-using Microsoft.AspNetCore.RateLimiting;
+using System.Text;
 using System.Threading.RateLimiting;
-using MuseumExhibits.API;
-
+using MuseumExhibits.Application.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
+var config  = builder.Configuration;
 
-var jwtSecret = configuration["JwtSettings:SecretKey"];
-if (string.IsNullOrEmpty(jwtSecret))
-{
-    throw new InvalidOperationException("JwtSettings:SecretKey is not set in the configuration.");
-}
+var jwtSecret = config["JwtSettings:SecretKey"]
+    ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured.");
 
 var key = Encoding.UTF8.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = true;
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -42,95 +38,98 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = configuration["JwtSettings:Issuer"],
-        ValidAudience = configuration["JwtSettings:Audience"],
+        ValidIssuer = config["JwtSettings:Issuer"],
+        ValidAudience = config["JwtSettings:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ClockSkew = TimeSpan.Zero
     };
 });
 
-builder.Services.AddControllers().AddNewtonsoftJson();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddCustomSwagger();
-
+builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<MuseumExhibitsDbContext>(options =>
-    options.UseSqlServer(configuration.GetConnectionString("MsSqlConnection")));
+    options.UseSqlServer(config.GetConnectionString("MsSqlConnection")));
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IExhibitRepository, ExhibitRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<ICloudImageClient, CloudImageClient>();
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IExhibitService, ExhibitService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<ICollectionService, CollectionService>();
 
+builder.Services.AddSingleton(new Cloudinary(new Account(
+    config["Cloudinary:CloudName"],
+    config["Cloudinary:ApiKey"],
+    config["Cloudinary:ApiSecret"]
+)));
 
-var cloudinaryAccount = new Account(
-    configuration["Cloudinary:CloudName"],
-    configuration["Cloudinary:ApiKey"],
-    configuration["Cloudinary:ApiSecret"]
-);
-builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
-
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
 builder.Services.AddCors(options =>
-{
     options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-});
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    options.AddFixedWindowLimiter("GlobalLimiter", limiterOptions =>
+    options.AddFixedWindowLimiter("GlobalLimiter", o =>
     {
-        limiterOptions.PermitLimit = 100;
-        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        o.PermitLimit = 100;
+        o.Window = TimeSpan.FromMinutes(1);
     });
 
-    options.AddTokenBucketLimiter("LoginLimiter", limiterOptions =>
+    options.AddTokenBucketLimiter("LoginLimiter", o =>
     {
-        limiterOptions.TokenLimit = 10;
-        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(5);
-        limiterOptions.TokensPerPeriod = 1;
-        limiterOptions.QueueLimit = 0;
+        o.TokenLimit = 10;
+        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        o.ReplenishmentPeriod = TimeSpan.FromMinutes(5);
+        o.TokensPerPeriod = 1;
+        o.QueueLimit = 0;
     });
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCustomSwagger();
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-app.UseRouting();
 app.UseCors();
-
+app.UseStaticFiles();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseRateLimiter();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.MapControllers();
+var api = app.MapGroup("/api");
+
+api.MapGroup("/auth")
+   .RequireRateLimiting("LoginLimiter")
+   .MapAuthEndpoints();
+
+var global = api.MapGroup(string.Empty)
+               .RequireRateLimiting("GlobalLimiter");
+
+global.MapGroup("/exhibits").MapExhibitEndpoints();
+global.MapGroup("/categories").MapCategoryEndpoints();
+global.MapGroup("/images").MapImageEndpoints();
+global.MapGroup("/posts").MapPostEndpoints();
+global.MapGroup("/collections").MapCollectionEndpoints();
 
 app.Run();

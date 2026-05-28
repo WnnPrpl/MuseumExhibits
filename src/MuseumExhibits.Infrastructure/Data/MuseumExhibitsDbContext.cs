@@ -9,6 +9,8 @@ namespace MuseumExhibits.Infrastructure.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Admin> Admins { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Collection> Collections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -17,6 +19,10 @@ namespace MuseumExhibits.Infrastructure.Data
             modelBuilder.Entity<Category>()
                 .HasIndex(c => c.Name)
                 .IsUnique();
+
+            modelBuilder.Entity<Exhibit>()
+                .Property(e => e.Cost)
+                .HasPrecision(18, 2);
 
             modelBuilder.Entity<Exhibit>()
                 .HasOne(e => e.Category)
@@ -29,6 +35,11 @@ namespace MuseumExhibits.Infrastructure.Data
                 .WithMany(e => e.Images)
                 .HasForeignKey(i => i.ExhibitId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Collection>()
+                .HasMany(c => c.Exhibits)
+                .WithMany(e => e.Collections)
+                .UsingEntity(j => j.ToTable("CollectionExhibits"));
         }
     }
 }

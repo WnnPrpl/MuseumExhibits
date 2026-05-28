@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MuseumExhibits.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using MuseumExhibits.Infrastructure.Data;
 namespace MuseumExhibits.Infrastructure.Migrations
 {
     [DbContext(typeof(MuseumExhibitsDbContext))]
-    partial class MuseumExhibitsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527165002_FixDecimalPrecision")]
+    partial class FixDecimalPrecision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

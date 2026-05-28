@@ -17,8 +17,8 @@ namespace MuseumExhibits.Application.DTO
         public DateOnly? EntryDate { get; set; }
         public string? CategoryName { get; set; }
 
-        public string? SortBy { get; set; } = "EntryDate";
-        public bool Descending { get; set; } = true;
+        public string? SortBy { get; set; }
+        public bool? Descending { get; set; }
 
         [Range(1, int.MaxValue)]
         public int PageNumber { get; set; } = 1;

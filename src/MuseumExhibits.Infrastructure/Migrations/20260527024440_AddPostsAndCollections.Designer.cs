@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MuseumExhibits.Infrastructure.Data;
 
@@ -11,13 +12,15 @@ using MuseumExhibits.Infrastructure.Data;
 namespace MuseumExhibits.Infrastructure.Migrations
 {
     [DbContext(typeof(MuseumExhibitsDbContext))]
-    partial class MuseumExhibitsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527024440_AddPostsAndCollections")]
+    partial class AddPostsAndCollections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -132,7 +135,6 @@ namespace MuseumExhibits.Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.Property<decimal?>("Cost")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("CreationCentury")

@@ -103,6 +103,7 @@ namespace MuseumExhibits.Core.Models
         public int? CreationCentury { get; set; }
 
         public List<Image> Images { get; set; } = [];
+        public List<Collection> Collections { get; set; } = [];
 
         public bool Visible { get; set; } = false;
     }
