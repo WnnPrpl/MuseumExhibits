@@ -26,13 +26,15 @@ namespace MuseumExhibits.Infrastructure.Repositories
             await _context.Collections
                 .AsNoTracking()
                 .Include(c => c.Exhibits)
+                    .ThenInclude(e => e.Images)
                 .ToListAsync();
 
         public async Task<(IEnumerable<Collection> Collections, int TotalCount)> GetPagedAsync(int page, int pageSize)
         {
             var query = _context.Collections
                 .AsNoTracking()
-                .Include(c => c.Exhibits);
+                .Include(c => c.Exhibits)
+                    .ThenInclude(e => e.Images);
 
             int totalCount = await query.CountAsync();
 

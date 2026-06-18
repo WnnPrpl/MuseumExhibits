@@ -7,5 +7,6 @@ namespace MuseumExhibits.Core.Abstractions
     {
         Task<Admin?> GetByEmailAsync(string email);
         Task CreateAsync(Admin admin);
+        Task<bool> AnyAsync();
     }
 }

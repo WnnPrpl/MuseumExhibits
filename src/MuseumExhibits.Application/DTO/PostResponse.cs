@@ -8,7 +8,6 @@ namespace MuseumExhibits.Application.DTO
         public string? ShortContent { get; set; }
         public string? ImageUrl { get; set; }
         public DateTime PublishedAt { get; set; }
-        public string? Category { get; set; }
         public bool Visible { get; set; }
     }
 }

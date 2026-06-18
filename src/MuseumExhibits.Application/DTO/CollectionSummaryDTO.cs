@@ -6,5 +6,6 @@ namespace MuseumExhibits.Application.DTO
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public int ExhibitCount { get; set; }
+        public string? CoverImageUrl { get; set; }
     }
 }

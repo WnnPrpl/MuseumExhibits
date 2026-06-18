@@ -6,6 +6,11 @@ namespace MuseumExhibits.API.Endpoints;
 
 public static class ImageEndpoints
 {
+    private static readonly string[] AllowedMimeTypes =
+        ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+    private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
+
     public static RouteGroupBuilder MapImageEndpoints(this RouteGroupBuilder group)
     {
         group.WithTags("Images");
@@ -30,6 +35,15 @@ public static class ImageEndpoints
         [FromForm] ImageRequest fileDTO,
         IImageService service)
     {
+        if (fileDTO.File is null)
+            return Results.BadRequest(new { message = "No file provided." });
+
+        if (fileDTO.File.Length > MaxFileSizeBytes)
+            return Results.BadRequest(new { message = "File exceeds the 10 MB size limit." });
+
+        if (!AllowedMimeTypes.Contains(fileDTO.File.ContentType.ToLowerInvariant()))
+            return Results.BadRequest(new { message = "Only JPEG, PNG, WebP, and GIF images are allowed." });
+
         var response = await service.UploadImage(entityId, fileDTO);
         return Results.Created($"/api/images/{entityId}", response);
     }

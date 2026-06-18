@@ -20,10 +20,7 @@ namespace MuseumExhibits.Application.DTO
         public string? SortBy { get; set; }
         public bool? Descending { get; set; }
 
-        [Range(1, int.MaxValue)]
-        public int PageNumber { get; set; } = 1;
-
-        [Range(1, int.MaxValue)]
-        public int PageSize { get; set; } = 10;
+        public int? PageNumber { get; set; }
+        public int? PageSize { get; set; }
     }
 }

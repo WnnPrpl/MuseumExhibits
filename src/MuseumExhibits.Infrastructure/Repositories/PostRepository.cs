@@ -29,9 +29,6 @@ namespace MuseumExhibits.Infrastructure.Repositories
             if (!string.IsNullOrWhiteSpace(filter.Title))
                 query = query.Where(p => EF.Functions.Like(p.Title.ToLower(), $"%{filter.Title.ToLower()}%"));
 
-            if (!string.IsNullOrWhiteSpace(filter.Category))
-                query = query.Where(p => p.Category == filter.Category);
-
             query = query.OrderByDescending(p => p.PublishedAt);
 
             int totalCount = await query.CountAsync();

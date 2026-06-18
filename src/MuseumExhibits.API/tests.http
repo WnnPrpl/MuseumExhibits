@@ -1,0 +1,236 @@
+@baseUrl = http://localhost:5075/api
+@token = PASTE_TOKEN_HERE
+@fakeToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fake.signature
+
+### Успішний логін → 200 + token
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin123"
+}
+
+### Неправильний пароль → 400
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "wrongpassword"
+}
+
+### Порожні поля → 400
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": ""
+}
+
+### Запит без токена → 401
+POST {{baseUrl}}/exhibits
+Content-Type: application/json
+
+{
+  "name": "Тест"
+}
+
+### Невалідний токен → 401
+POST {{baseUrl}}/exhibits
+Content-Type: application/json
+Authorization: Bearer {{fakeToken}}
+
+{
+  "name": "Тест"
+}
+
+### Створення експоната → 201
+POST {{baseUrl}}/exhibits
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Глиняний глечик",
+  "authorOrManufacturer": "Невідомий майстер",
+  "classification": "Кераміка",
+  "material": "Глина",
+  "preservationState": "Задовільний",
+  "registrationNumber": "КЕР-001",
+  "responsibleKeeper": "Коваленко О.М.",
+  "enteredBy": "Петренко В.І.",
+  "fullDescription": "Глиняний глечик XIX ст.",
+  "visible": true
+}
+
+### Відсутні обов'язкові поля → 400
+POST {{baseUrl}}/exhibits
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Без обов'язкових полів"
+}
+
+### Неіснуюча категорія → 404
+POST {{baseUrl}}/exhibits
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Експонат",
+  "authorOrManufacturer": "Автор",
+  "classification": "Клас",
+  "material": "Матеріал",
+  "preservationState": "Добрий",
+  "registrationNumber": "002",
+  "responsibleKeeper": "Іванов",
+  "enteredBy": "Петров",
+  "fullDescription": "Опис",
+  "categoryId": "00000000-0000-0000-0000-000000000000"
+}
+
+### Неіснуючий експонат → 404
+GET {{baseUrl}}/exhibits/00000000-0000-0000-0000-000000000000
+
+### Список категорій → 200
+GET {{baseUrl}}/categories
+
+### Створення категорії → 201
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Тестова категорія"
+}
+
+### Порожня назва категорії → 400
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": ""
+}
+
+### Видалення неіснуючого експоната → 404
+DELETE {{baseUrl}}/exhibits/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### Видалення експоната з зображеннями → 204 (зображення видаляються автоматично)
+DELETE {{baseUrl}}/exhibits/EXHIBIT_ID_WITH_IMAGES
+Authorization: Bearer {{token}}
+
+### Список колекцій → 200
+GET {{baseUrl}}/collections
+
+### Створення колекції → 201
+POST {{baseUrl}}/collections
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Тестова колекція",
+  "description": "Опис колекції"
+}
+
+### Колекція без назви → 400
+POST {{baseUrl}}/collections
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": ""
+}
+
+### Список публікацій → 200
+GET {{baseUrl}}/posts
+
+### Створення публікації → 201
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Нова публікація",
+  "content": "Повний текст публікації",
+  "shortContent": "Короткий опис",
+  "visible": true
+}
+
+### Публікація без обов'язкових полів → 400
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "shortContent": "Тільки короткий опис"
+}
+
+### Rate limiting спроба 1/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 2/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 3/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 4/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 5/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 6/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 7/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 8/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 9/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 10/11
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }
+
+### Rate limiting спроба 11/11 → 429
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "brute@force.com", "password": "attempt" }

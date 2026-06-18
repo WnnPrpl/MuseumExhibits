@@ -23,7 +23,7 @@ namespace MuseumExhibits.Application.Services
             var filter = _mapper.Map<PostFilter>(queryParams);
             var (posts, totalCount) = await _postRepository.GetAsync(filter, isAdmin);
             var dtos = _mapper.Map<IEnumerable<PostResponse>>(posts);
-            return new PagedResult<PostResponse>(dtos, totalCount, queryParams.PageNumber, queryParams.PageSize);
+            return new PagedResult<PostResponse>(dtos, totalCount, queryParams.PageNumber ?? 1, queryParams.PageSize ?? 10);
         }
 
         public async Task<Guid> Create(PostRequest request)

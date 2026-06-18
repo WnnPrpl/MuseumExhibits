@@ -32,7 +32,7 @@ namespace MuseumExhibits.Application.Services
             var (exhibits, totalCount) = await _exhibitRepository.GetAsync(filters, isAdmin);
             var exhibitDtos = _mapper.Map<IEnumerable<ExhibitSummaryDTO>>(exhibits);
 
-            return new PagedResult<ExhibitSummaryDTO>(exhibitDtos, totalCount, queryParams.PageNumber, queryParams.PageSize);
+            return new PagedResult<ExhibitSummaryDTO>(exhibitDtos, totalCount, queryParams.PageNumber ?? 1, queryParams.PageSize ?? 10);
         }
 
         public async Task<Guid> Create(ExhibitRequest exhibitDto)

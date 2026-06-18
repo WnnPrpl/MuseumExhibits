@@ -32,8 +32,10 @@ namespace MuseumExhibits.Application.Mapping
                         : string.Empty));
 
             CreateMap<ExhibitQueryParameters, ExhibitFilter>()
-                .ForMember(dest => dest.Descending, opt => opt.MapFrom(src => src.Descending ?? true))
-                .ForMember(dest => dest.SortBy, opt => opt.MapFrom(src => src.SortBy ?? "EntryDate"));
+                .ForMember(dest => dest.Descending,  opt => opt.MapFrom(src => src.Descending ?? true))
+                .ForMember(dest => dest.SortBy,      opt => opt.MapFrom(src => src.SortBy ?? "EntryDate"))
+                .ForMember(dest => dest.PageNumber,  opt => opt.MapFrom(src => src.PageNumber ?? 1))
+                .ForMember(dest => dest.PageSize,    opt => opt.MapFrom(src => Math.Min(src.PageSize ?? 10, 500)));
 
             CreateMap<JsonPatchDocument<ExhibitRequest>, JsonPatchDocument<Exhibit>>();
 
@@ -45,11 +47,23 @@ namespace MuseumExhibits.Application.Mapping
 
             CreateMap<PostRequest, Post>();
             CreateMap<Post, PostResponse>();
-            CreateMap<PostQueryParameters, PostFilter>();
+            CreateMap<PostQueryParameters, PostFilter>()
+                .ForMember(dest => dest.PageNumber, opt => opt.MapFrom(src => src.PageNumber ?? 1))
+                .ForMember(dest => dest.PageSize,   opt => opt.MapFrom(src => Math.Min(src.PageSize ?? 10, 200)));
 
             CreateMap<Collection, CollectionResponse>();
             CreateMap<Collection, CollectionSummaryDTO>()
-                .ForMember(dest => dest.ExhibitCount, opt => opt.MapFrom(src => src.Exhibits.Count));
+                .ForMember(dest => dest.ExhibitCount, opt => opt.MapFrom(src => src.Exhibits.Count))
+                .ForMember(dest => dest.CoverImageUrl, opt => opt.MapFrom(src =>
+                    src.Exhibits
+                        .SelectMany(e => e.Images)
+                        .Where(i => i.IsTitleImage)
+                        .Select(i => i.Url)
+                        .FirstOrDefault()
+                    ?? src.Exhibits
+                        .SelectMany(e => e.Images)
+                        .Select(i => i.Url)
+                        .FirstOrDefault()));
         }
     }
 }

@@ -18,8 +18,9 @@ using MuseumExhibits.Application.Abstractions;
 var builder = WebApplication.CreateBuilder(args);
 var config  = builder.Configuration;
 
-var jwtSecret = config["JwtSettings:SecretKey"]
-    ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured.");
+var jwtSecret = config["JwtSettings:SecretKey"];
+if (string.IsNullOrWhiteSpace(jwtSecret) || jwtSecret.StartsWith("CHANGE_ME"))
+    throw new InvalidOperationException("JwtSettings:SecretKey is not configured or is still the placeholder.");
 
 var key = Encoding.UTF8.GetBytes(jwtSecret);
 
@@ -73,9 +74,14 @@ builder.Services.AddSingleton(new Cloudinary(new Account(
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
+var allowedOrigins = (config["AllowedOrigins"] ?? "")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()));
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -114,8 +120,12 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSwagger();
-app.UseSwaggerUI();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 var api = app.MapGroup("/api");
 

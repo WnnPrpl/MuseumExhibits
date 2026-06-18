@@ -3,10 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MuseumExhibits.Application.DTO
 {
-    public class ImageRequest
+    public class PostImageRequest
     {
-        public bool IsTitleImage { get; set; }
-
+        [Required]
         public IFormFile File { get; set; } = default!;
     }
 }

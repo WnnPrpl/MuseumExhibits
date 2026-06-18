@@ -8,7 +8,6 @@ namespace MuseumExhibits.Core.Models
         public string? ShortContent { get; set; }
         public string? ImageUrl { get; set; }
         public DateTime PublishedAt { get; set; } = DateTime.UtcNow;
-        public string? Category { get; set; }
         public bool Visible { get; set; } = false;
     }
 }

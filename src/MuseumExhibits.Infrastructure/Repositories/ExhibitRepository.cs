@@ -24,6 +24,11 @@ namespace MuseumExhibits.Infrastructure.Repositories
             return exhibit;
         }
 
+        public async Task<List<Exhibit>> GetByIdsTrackedAsync(IEnumerable<Guid> ids) =>
+            await _context.Exhibits
+                .Where(e => ids.Contains(e.Id))
+                .ToListAsync();
+
         public async Task<(IEnumerable<Exhibit> Exhibits, int TotalCount)> GetAsync(ExhibitFilter filter, bool isAdmin)
         {
             IQueryable<Exhibit> query = _context.Exhibits
@@ -59,8 +64,9 @@ namespace MuseumExhibits.Infrastructure.Repositories
 
             if (filter.CreationCentury.HasValue)
             {
-                int centuryMin = (filter.CreationCentury.Value - 1) * 100 + 1;
-                int centuryMax = filter.CreationCentury.Value * 100;
+                int c          = filter.CreationCentury.Value;
+                int centuryMin = c > 0 ? (c - 1) * 100 + 1 : c * 100;
+                int centuryMax = c > 0 ? c * 100 : (c + 1) * 100 - 1;
 
                 query = query.Where(e =>
                     (e.CreationExactDate.HasValue && e.CreationExactDate.Value.Year >= centuryMin && e.CreationExactDate.Value.Year <= centuryMax) ||
@@ -74,7 +80,11 @@ namespace MuseumExhibits.Infrastructure.Repositories
                 query = query.Where(e =>
                     (e.CreationExactDate.HasValue ? e.CreationExactDate.Value.Year :
                      e.CreationYear.HasValue ? e.CreationYear.Value :
-                     e.CreationCentury.HasValue ? ((e.CreationCentury.Value - 1) * 100 + 1) : int.MaxValue)
+                     e.CreationCentury.HasValue
+                         ? (e.CreationCentury.Value > 0
+                             ? (e.CreationCentury.Value - 1) * 100 + 1
+                             : e.CreationCentury.Value * 100)
+                         : int.MaxValue)
                     >= filter.CreationYearMin.Value);
             }
 
@@ -83,7 +93,11 @@ namespace MuseumExhibits.Infrastructure.Repositories
                 query = query.Where(e =>
                     (e.CreationExactDate.HasValue ? e.CreationExactDate.Value.Year :
                      e.CreationYear.HasValue ? e.CreationYear.Value :
-                     e.CreationCentury.HasValue ? (e.CreationCentury.Value * 100) : int.MinValue)
+                     e.CreationCentury.HasValue
+                         ? (e.CreationCentury.Value > 0
+                             ? e.CreationCentury.Value * 100
+                             : (e.CreationCentury.Value + 1) * 100 - 1)
+                         : int.MinValue)
                     <= filter.CreationYearMax.Value);
             }
 
@@ -104,15 +118,21 @@ namespace MuseumExhibits.Infrastructure.Repositories
                     : query.OrderBy(e => e.Name),
                 "creation" => filter.Descending
                     ? query.OrderByDescending(e =>
-                        e.CreationExactDate.HasValue ? e.CreationExactDate :
-                        e.CreationYear.HasValue ? new DateOnly(e.CreationYear.Value, 1, 1) :
-                        e.CreationCentury.HasValue ? new DateOnly((e.CreationCentury.Value - 1) * 100 + 1, 1, 1) :
-                        (DateOnly?)null)
+                        e.CreationExactDate.HasValue ? (int?)e.CreationExactDate.Value.Year :
+                        e.CreationYear.HasValue ? e.CreationYear.Value :
+                        e.CreationCentury.HasValue
+                            ? (e.CreationCentury.Value > 0
+                                ? (e.CreationCentury.Value - 1) * 100 + 1
+                                : e.CreationCentury.Value * 100)
+                            : null)
                     : query.OrderBy(e =>
-                        e.CreationExactDate.HasValue ? e.CreationExactDate :
-                        e.CreationYear.HasValue ? new DateOnly(e.CreationYear.Value, 1, 1) :
-                        e.CreationCentury.HasValue ? new DateOnly((e.CreationCentury.Value - 1) * 100 + 1, 1, 1) :
-                        (DateOnly?)null),
+                        e.CreationExactDate.HasValue ? (int?)e.CreationExactDate.Value.Year :
+                        e.CreationYear.HasValue ? e.CreationYear.Value :
+                        e.CreationCentury.HasValue
+                            ? (e.CreationCentury.Value > 0
+                                ? (e.CreationCentury.Value - 1) * 100 + 1
+                                : e.CreationCentury.Value * 100)
+                            : null),
                 _ => filter.Descending
                     ? query.OrderByDescending(e => e.EntryDate)
                     : query.OrderBy(e => e.EntryDate)

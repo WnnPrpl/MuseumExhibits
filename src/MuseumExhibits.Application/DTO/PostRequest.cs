@@ -16,9 +16,6 @@ namespace MuseumExhibits.Application.DTO
 
         public string? ImageUrl { get; set; }
 
-        [StringLength(50)]
-        public string? Category { get; set; }
-
         public bool Visible { get; set; } = false;
     }
 }

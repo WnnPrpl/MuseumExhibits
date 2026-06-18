@@ -15,7 +15,7 @@ namespace MuseumExhibits.Infrastructure.Cloud
 
             var uploadParams = new ImageUploadParams
             {
-                File = new FileDescription(file.FileName, fileStream),
+                File = new FileDescription(Guid.NewGuid().ToString(), fileStream),
                 Folder = folderPath
             };
 

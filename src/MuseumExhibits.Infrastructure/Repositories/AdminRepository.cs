@@ -17,5 +17,8 @@ namespace MuseumExhibits.Infrastructure.Repositories
             _context.Admins.Add(admin);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> AnyAsync() =>
+            await _context.Admins.AnyAsync();
     }
 }

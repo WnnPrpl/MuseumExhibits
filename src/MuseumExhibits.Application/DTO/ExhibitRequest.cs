@@ -130,10 +130,10 @@ namespace MuseumExhibits.Application.DTO
 
         public DateOnly? CreationExactDate { get; set; }
 
-        [Range(1, 9999)]
+        [Range(-9999, 9999)]
         public int? CreationYear { get; set; }
 
-        [Range(1, 99)]
+        [Range(-99, 99)]
         public int? CreationCentury { get; set; }
 
         public bool Visible { get; set; } = false;
